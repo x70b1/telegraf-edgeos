@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ "$1" = remove ]; then
+	systemctl stop telegraf.service > /dev/null || true
+	systemctl disable telegraf.service > /dev/null || true
+fi
+
+exit 0

@@ -1,0 +1,2 @@
+telegraf ALL = NOPASSWD: /usr/sbin/ubnt-hal getPowerStatus
+telegraf ALL = NOPASSWD: /usr/sbin/ubnt-hal getTemp

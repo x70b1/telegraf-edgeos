@@ -1,0 +1,190 @@
+name: Release
+on:
+  push:
+    tags:
+      - '**'
+env:
+  VERSION_UPSTREAM: 1.21.3
+  VERSION_PACKAGE: 1.21.3-1
+jobs:
+  ShellCheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install
+        run: |
+            wget -O /opt/shellcheck-stable.linux.x86_64.tar.xz https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz
+            tar xf /opt/shellcheck-stable.linux.x86_64.tar.xz -C /opt
+      - name: Version4
+        run: /opt/shellcheck-stable/shellcheck --version
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Analysis
+        run: find . '(' -name '*.sh' ')' -exec /opt/shellcheck-stable/shellcheck {} +
+  mips:
+    runs-on: ubuntu-latest
+    env:
+      ARCH_GOLANG: mips
+      ARCH_EDGEOS: mips
+    steps:
+      - name: Golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: telegraf-edgeos
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: telegraf
+          repository: influxdb/telegraf
+          ref: v${{ env.VERSION_UPSTREAM }}
+      - name: Patches
+        run: cp -r -v telegraf-edgeos/patches/* telegraf/
+      - name: Build
+        run: |
+          cd telegraf
+          GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} go build -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" ./cmd/telegraf
+      - name: sha256sum
+        run: sha256sum telegraf/telegraf
+      - name: Filesize
+        run: du -h telegraf/telegraf
+      - name: Packaging
+        run: |
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/bin
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/default
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/telegraf/telegraf.d
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/lib/systemd/system
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/sudoers.d/
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/lib/telegraf
+
+          touch telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/default/telegraf
+          cp telegraf-edgeos/configs/telegraf.conf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/telegraf/telegraf.conf
+          cp telegraf-edgeos/configs/telegraf.service telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/lib//systemd/system/telegraf.service
+          cp telegraf-edgeos/configs/99telegraf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/sudoers.d/99telegraf
+          cp telegraf/telegraf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/bin/telegraf
+          cp -r telegraf-edgeos/plugins/* telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/lib/telegraf/
+
+          cp -r telegraf-edgeos/packaging/* telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN
+          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/preinst
+          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/postinst
+          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/prerm
+          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/postrm
+          sed -i 's/#VERSION/${{ env.VERSION_PACKAGE }}/' telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
+          sed -i 's/#ARCH/${{ env.ARCH_EDGEOS }}/' telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
+          sed -i "s/#SIZE/$(echo $(du -sk --exclude=./telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }} | awk '{{ print $1 }}'))/" telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
+          cd telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }} && md5sum $(find * -type f -not -path 'DEBIAN/*') > DEBIAN/md5sums && cd ..
+
+          dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}
+          dpkg-deb --info telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
+          path: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
+  mipsel:
+    runs-on: ubuntu-latest
+    env:
+      ARCH_EDGEOS: mipsel
+      ARCH_GOLANG: mipsle
+    steps:
+      - name: Golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: telegraf-edgeos
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: telegraf
+          repository: influxdb/telegraf
+          ref: v${{ env.VERSION_UPSTREAM }}
+      - name: Patches
+        run: cp -r -v telegraf-edgeos/patches/* telegraf/
+      - name: Build
+        run: |
+          cd telegraf
+          GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} go build -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" ./cmd/telegraf
+      - name: sha256sum
+        run: sha256sum telegraf/telegraf
+      - name: Filesize
+        run: du -h telegraf/telegraf
+      - name: Packaging
+        run: |
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/bin
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/default
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/telegraf/telegraf.d
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/lib/systemd/system
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/sudoers.d/
+          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/lib/telegraf
+
+          touch telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/default/telegraf
+          cp telegraf-edgeos/configs/telegraf.conf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/telegraf/telegraf.conf
+          cp telegraf-edgeos/configs/telegraf.service telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/lib//systemd/system/telegraf.service
+          cp telegraf-edgeos/configs/99telegraf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/sudoers.d/99telegraf
+          cp telegraf/telegraf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/bin/telegraf
+          cp -r telegraf-edgeos/plugins/* telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/lib/telegraf/
+
+          cp -r telegraf-edgeos/packaging/* telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN
+          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/preinst
+          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/postinst
+          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/prerm
+          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/postrm
+          sed -i 's/#VERSION/${{ env.VERSION_PACKAGE }}/' telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
+          sed -i 's/#ARCH/${{ env.ARCH_EDGEOS }}/' telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
+          sed -i "s/#SIZE/$(echo $(du -sk --exclude=./telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }} | awk '{{ print $1 }}'))/" telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
+          cd telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }} && md5sum $(find * -type f -not -path 'DEBIAN/*') > DEBIAN/md5sums && cd ..
+
+          dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}
+          dpkg-deb --info telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
+  Release:
+    needs:
+      - ShellCheck
+      - mips
+      - mipsel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Draft
+        uses: actions/create-release@v1
+        id: draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: true
+          prerelease: false
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          name: telegraf_${{ env.VERSION_PACKAGE }}_mips.deb
+          path: ./
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          name: telegraf_${{ env.VERSION_PACKAGE }}_mipsel.deb
+          path: ./
+      - name: telegraf_${{ env.VERSION_PACKAGE }}_mips.deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.draft.outputs.upload_url }}
+          asset_path: telegraf_${{ env.VERSION_PACKAGE }}_mips.deb
+          asset_name: telegraf_${{ env.VERSION_PACKAGE }}_mips.deb
+          asset_content_type: application/vnd.debian.binary-package
+      - name: telegraf_${{ env.VERSION_PACKAGE }}_mipsel.deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.draft.outputs.upload_url }}
+          asset_path: telegraf_${{ env.VERSION_PACKAGE }}_mipsel.deb
+          asset_name: telegraf_${{ env.VERSION_PACKAGE }}_mipsel.deb
+          asset_content_type: application/vnd.debian.binary-package

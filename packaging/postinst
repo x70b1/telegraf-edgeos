@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ "$1" = "configure" ]; then
+    if ! getent passwd telegraf > /dev/null; then
+        adduser --quiet --system --group --no-create-home --home /etc/telegraf --shell /bin/false telegraf
+    fi
+fi
+
+systemctl daemon-reload > /dev/null || true
+systemctl enable telegraf.service > /dev/null || true
+
+exit 0
