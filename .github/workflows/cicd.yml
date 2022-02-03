@@ -7,7 +7,7 @@ on:
       - '**'
 env:
   VERSION_UPSTREAM: 1.21.3
-  VERSION_PACKAGE: 1.21.3-1
+  VERSION_PACKAGE: 1.21.3-2
 jobs:
   ShellCheck:
     runs-on: ubuntu-latest
