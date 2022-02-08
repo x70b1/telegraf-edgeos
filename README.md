@@ -10,7 +10,7 @@ A lightweight Telegraf distribution customized for Ubiquiti's EdgeOS.
 
 ## What is different here?
 
-This Telegraf is crosscompiled for mips and mipsel.
+This Telegraf is crosscompiled for `mips` and `mipsel`.
 To reduce the size only essential and basic networking related internal plugins are part of the packaged binary.
 Check [inputs](https://github.com/x70b1/telegraf-edgeos/blob/master/patches/plugins/inputs/all/all.go) and [outputs](https://github.com/x70b1/telegraf-edgeos/blob/master/patches/plugins/outputs/all/all.go) to figure out which internal plugins are included.
 The result is a ~ 18 mb binary file instead of ~ 130 mb for a full featured Telegraf.
@@ -89,4 +89,4 @@ dpkg -i telegraf.deb
 You can upgrade Telegraf with the same commands.
 
 As you already know from InfluxData's distribution of Telegraf, the configuration is located at `/etc/telegraf/telegraf.conf` and `/etc/telegraf/telegraf.d`.
-The sample config is pre-installed. This needs to be modified for your own use case.
+The [sample config](https://github.com/x70b1/telegraf-edgeos/blob/master/configs/telegraf.conf) is pre-installed. This needs to be modified for your own use case.
