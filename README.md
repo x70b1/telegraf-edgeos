@@ -59,7 +59,7 @@ edgeos_temperature,sensor=PHY\ 2 temperature=57.50
 
 Your device is not listed with a check mark? Please open an issue if you have tested Telegraf on an EdgeRouter and share your findings.
 
-|                       | Package               | Internal Plugins      | edgeos.sh/firmware    | edgeos.sh/interfaces  | edgeos.sh/power       | edgeos.sh/temp        |
+|                       | Package               | Internal Plugins      | firmware              | interfaces            | power                 | temperature           |
 | --------------------- | --------------------- | :----:                | :----:                | :----:                | :----:                | :----:                |
 | `ER-X`                | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
 | `ER-X-SFP`            | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
