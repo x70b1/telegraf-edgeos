@@ -57,8 +57,6 @@ edgeos_temperature,sensor=PHY\ 2 temperature=57.50
 
 ## Supported Hardware
 
-Your device is not listed with a check mark? Please open an issue if you have tested Telegraf on an EdgeRouter and share your findings.
-
 |                       | Package               | Internal Plugins      | firmware              | interfaces            | power                 | temperature           |
 | --------------------- | --------------------- | :----:                | :----:                | :----:                | :----:                | :----:                |
 | `ER-X`                | mipsel                | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
@@ -75,6 +73,15 @@ Your device is not listed with a check mark? Please open an issue if you have te
 | `ERPro-8`             | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
 | `EP-R6`               | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
 | `EP-R8`               | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+
+
+:heavy_check_mark: = Works for me!
+
+:x: = Not supported on hardware
+
+:grey_question: = Unknown
+
+Your device is not listed with a check mark? Please open an issue if you have tested Telegraf on an EdgeRouter and share your findings.
 
 
 ## Setup
