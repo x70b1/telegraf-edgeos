@@ -61,7 +61,7 @@ Your device is not listed with a check mark? Please open an issue if you have te
 
 |                       | Package               | Internal Plugins      | firmware              | interfaces            | power                 | temperature           |
 | --------------------- | --------------------- | :----:                | :----:                | :----:                | :----:                | :----:                |
-| `ER-X`                | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+| `ER-X`                | mipsel                | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
 | `ER-X-SFP`            | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
 | `ER-4`                | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
 | `ER-6P`               | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
