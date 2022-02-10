@@ -82,7 +82,7 @@ Your device is not listed with a check mark? Please open an issue if you have te
 Install the prebuild package:
 
 ```
-curl -o telegraf.deb https://github.com/x70b1/telegraf-edgeos/releases/download/{RELEASE}/telegraf_{RELEASE}_{ARCH}.deb
+curl -L -o telegraf.deb https://github.com/x70b1/telegraf-edgeos/releases/download/{RELEASE}/telegraf_{RELEASE}_{ARCH}.deb
 dpkg -i telegraf.deb
 ```
 
