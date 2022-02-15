@@ -1,10 +1,13 @@
 #!/bin/sh
 
 edgeos_firmware() {
-    firmware_running=$(cut -d '.' -f 3- < /etc/version | rev | cut -d '.' -f 4- | rev)
     firmware_product=$(cut -d '.' -f 2 < /etc/version | cut -d '-' -f 2)
     firmware_parameter="filter=eq~~platform~~edgerouter&filter=eq~~channel~~release&filter=eq~~product~~$firmware_product"
+
+    firmware_running=$(sudo /usr/sbin/ubnt-hal show-version | grep Version | cut -d ' ' -f 7)
     firmware_availiable=$(curl -sf "https://fw-update.ubnt.com/api/firmware-latest?$firmware_parameter" | jq -r ._embedded.firmware[0].version)
+    firmware_model=$(sudo /usr/sbin/ubnt-hal show-version | grep model | cut -d ' ' -f 7-)
+    firmware_serial=$(sudo /usr/sbin/ubnt-hal show-version | grep S/N | cut -d ' ' -f 9-)
 
     if [ -n "$firmware_availiable" ]; then
         if [ "$firmware_running" = "$firmware_availiable" ]; then
@@ -17,7 +20,7 @@ edgeos_firmware() {
         firmware_upgrade=0
     fi
 
-    echo "edgeos_firmware running=\"$firmware_running\",availiable=\"$firmware_availiable\",upgrade=$firmware_upgrade"
+    echo "edgeos_firmware running=\"$firmware_running\",availiable=\"$firmware_availiable\",upgrade=$firmware_upgrade,model=\"$firmware_model\",serial=\"$firmware_serial\""
 }
 
 edgeos_interfaces() {

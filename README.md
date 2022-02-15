@@ -34,7 +34,7 @@ It works with different parameters:
 Example:
 
 ```
-edgeos_firmware running="v2.0.9-hotfix.2",availiable="v2.0.9-hotfix.2",upgrade=0
+edgeos_firmware running="v2.0.9-hotfix.2",availiable="v2.0.9-hotfix.2",upgrade=0,model="EdgeRouter 12",serial="ABC123456"
 
 ...
 
