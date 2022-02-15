@@ -1,3 +1,6 @@
+[![Dashboard](grafana/grafana_edgerouter_banner.png)](#)
+
+
 # telegraf-edgeos
 
 [![CI/CD](https://github.com/x70b1/telegraf-edgeos/actions/workflows/cicd.yml/badge.svg?branch=master)](https://github.com/x70b1/telegraf-edgeos/actions)
@@ -8,12 +11,13 @@
 A lightweight Telegraf distribution customized for Ubiquiti's EdgeOS.
 
 
-## What is different here?
+## What is so cool here?
 
 This Telegraf is crosscompiled for `mips` and `mipsel`.
 To reduce the size only essential and basic networking related internal plugins are part of the packaged binary.
 Check [inputs](https://github.com/x70b1/telegraf-edgeos/blob/master/patches/plugins/inputs/all/all.go) and [outputs](https://github.com/x70b1/telegraf-edgeos/blob/master/patches/plugins/outputs/all/all.go) to figure out which internal plugins are included.
 The result is a ~ 18 mb binary file instead of ~ 130 mb for a full featured Telegraf.
+So it should fit on every EdgeRouter.
 
 
 ## edgeos.sh
@@ -77,11 +81,11 @@ edgeos_temperature,sensor=PHY\ 2 temperature=57.50
 
 :heavy_check_mark: = Works for me!
 
-:x: = Not supported on hardware
+:x: = No hardware support for this feature :(
 
 :grey_question: = Unknown
 
-Your device is not listed with a check mark? Please open an issue if you have tested Telegraf on an EdgeRouter and share your findings.
+Your device is not listed with a green check mark? Please open an issue if you have tested Telegraf on an EdgeRouter and share your findings.
 
 
 ## Setup
@@ -97,3 +101,14 @@ You can upgrade Telegraf with the same commands.
 
 As you already know from InfluxData's distribution of Telegraf, the configuration is located at `/etc/telegraf/telegraf.conf` and `/etc/telegraf/telegraf.d`.
 The [sample config](https://github.com/x70b1/telegraf-edgeos/blob/master/configs/telegraf.conf) is pre-installed. This needs to be modified for your own use case.
+
+
+## Dashboard
+
+I added a sample Grafana dashboard.
+
+It comes without warranty.
+You will have to customize it.
+
+* [grafana_edgerouter.json](grafana/grafana_edgerouter.json)
+* [grafana_edgerouter_fullscreen.png](grafana/grafana_edgerouter_fullscreen.png)

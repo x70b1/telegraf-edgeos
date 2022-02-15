@@ -1,0 +1,2437 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 44,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P12F67F8539C46701"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Availability",
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "index": 1,
+                  "text": "Up!"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "from": 1,
+                "result": {
+                  "index": 0,
+                  "text": "Down!"
+                },
+                "to": 2
+              },
+              "type": "range"
+            }
+          ],
+          "noValue": "?",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(13, 99, 0)",
+                "value": null
+              },
+              {
+                "color": "rgb(158, 12, 12)",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 0
+      },
+      "id": 41,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P12F67F8539C46701"
+          },
+          "groupBy": [],
+          "measurement": "ping",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT last(\"result_code\") + last(\"http_response_code\") as \"result\" FROM \"http_response\" WHERE (\"server\" = 'https://grafana.uptimelabs.com/login') AND $timeFilter GROUP BY time($interval) fill(null)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "result_code"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "url",
+              "operator": "=",
+              "value": "edgerouter.example.com"
+            }
+          ]
+        }
+      ],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P12F67F8539C46701"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "displayName": "Uptime",
+          "mappings": [
+            {
+              "options": {
+                "from": 99.995,
+                "result": {
+                  "color": "#0d6300",
+                  "index": 0,
+                  "text": "100%"
+                },
+                "to": 100
+              },
+              "type": "range"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "noValue": "?",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(13, 99, 0)",
+                "value": null
+              },
+              {
+                "color": "rgb(158, 12, 12)",
+                "value": 0
+              },
+              {
+                "color": "rgb(212, 158, 0)",
+                "value": 90
+              },
+              {
+                "color": "rgb(13, 99, 0)",
+                "value": 95
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 0
+      },
+      "id": 58,
+      "interval": "",
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P12F67F8539C46701"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT (sum(\"up\") / sum(\"all\")) * 100 AS \"uptime\" FROM (\nSELECT \"up\", \"all\" FROM (\nSELECT count(\"result_code\") AS \"all\" FROM \"ping\" WHERE (\"url\" = 'edgerouter.example.com') AND $timeFilter GROUP BY \"url\"), (\nSELECT count(\"result_code\") AS \"up\" FROM \"ping\" WHERE (\"url\" = 'edgerouter.example.com') AND \"result_code\" = 0 AND $timeFilter GROUP BY \"url\"\n)\n)\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "transformations": [],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P12F67F8539C46701"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "Upstream",
+          "mappings": [],
+          "noValue": "?",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(13, 99, 0)",
+                "value": null
+              },
+              {
+                "color": "rgb(212, 158, 0)",
+                "value": 50
+              },
+              {
+                "color": "rgb(158, 12, 12)",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 6,
+        "y": 0
+      },
+      "id": 35,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P12F67F8539C46701"
+          },
+          "groupBy": [],
+          "measurement": "ping",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT mean(\"response_time\") FROM \"http_response\" WHERE (\"server\" = 'https://network-operations.center/login') AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "average_response_ms"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "url",
+              "operator": "=",
+              "value": "1.1.1.1"
+            }
+          ]
+        }
+      ],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "displayName": "Power Consumption",
+          "mappings": [],
+          "noValue": "?",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(212, 158, 0)",
+                "value": null
+              },
+              {
+                "color": "#1f71ab",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 9,
+        "y": 0
+      },
+      "id": 14,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "edgeos_power",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT sum(\"numSeries\") FROM ( SELECT last(\"numSeries\") AS numSeries FROM \"database\" GROUP BY \"database\")",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "consumption"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            }
+          ]
+        }
+      ],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "displayName": "CPU Temperature",
+          "mappings": [],
+          "noValue": "?",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(212, 158, 0)",
+                "value": null
+              },
+              {
+                "color": "#1f71ab",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 12,
+        "y": 0
+      },
+      "id": 43,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "edgeos_temperature",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT sum(\"numSeries\") FROM ( SELECT last(\"numSeries\") AS numSeries FROM \"database\" GROUP BY \"database\")",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "temperature"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "sensor",
+              "operator": "=",
+              "value": "CPU"
+            }
+          ]
+        }
+      ],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 2000000,
+          "min": -2000000,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RX"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#d60000",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TX"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#044fbf",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "number"
+            },
+            "properties": [
+              {
+                "id": "custom.axisLabel",
+                "value": "eth0"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 0,
+        "y": 3
+      },
+      "id": 44,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$col",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "net",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT non_negative_difference(mean(\"bytes_sent\")) * 8 / 60 FROM \"net\" WHERE (\"host\" = 'edgerouter' AND \"interface\" = 'eth0') AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "bytes_recv"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "* 8"
+                ],
+                "type": "math"
+              },
+              {
+                "params": [
+                  "RX"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "bytes_sent"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "* 8 * -1"
+                ],
+                "type": "math"
+              },
+              {
+                "params": [
+                  "TX"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "interface",
+              "operator": "=",
+              "value": "eth0"
+            }
+          ]
+        }
+      ],
+      "transformations": [],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 2000000,
+          "min": -2000000,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RX"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#01874d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TX"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa400",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "number"
+            },
+            "properties": [
+              {
+                "id": "custom.axisLabel",
+                "value": "eth1"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 5,
+        "y": 3
+      },
+      "id": 59,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$col",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "net",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT non_negative_difference(mean(\"bytes_sent\")) * 8 / 60 FROM \"net\" WHERE (\"host\" = 'edgerouter' AND \"interface\" = 'eth0') AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "bytes_recv"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "* 8"
+                ],
+                "type": "math"
+              },
+              {
+                "params": [
+                  "RX"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "bytes_sent"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "* 8 * -1"
+                ],
+                "type": "math"
+              },
+              {
+                "params": [
+                  "TX"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "interface",
+              "operator": "=",
+              "value": "eth1"
+            }
+          ]
+        }
+      ],
+      "transformations": [],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 2000000,
+          "min": -2000000,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RX"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#950088",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TX"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#00b5a6",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "number"
+            },
+            "properties": [
+              {
+                "id": "custom.axisLabel",
+                "value": "eth5"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 10,
+        "y": 3
+      },
+      "id": 60,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$col",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "net",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT non_negative_difference(mean(\"bytes_sent\")) * 8 / 60 FROM \"net\" WHERE (\"host\" = 'edgerouter' AND \"interface\" = 'eth0') AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "bytes_recv"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "* 8"
+                ],
+                "type": "math"
+              },
+              {
+                "params": [
+                  "RX"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "bytes_sent"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "* 8 * -1"
+                ],
+                "type": "math"
+              },
+              {
+                "params": [
+                  "TX"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "interface",
+              "operator": "=",
+              "value": "eth5"
+            }
+          ]
+        }
+      ],
+      "transformations": [],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "displayName": "CPU",
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0d6300",
+                "value": null
+              },
+              {
+                "color": "#ffad00",
+                "value": 75
+              },
+              {
+                "color": "#9e0c0c",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 15,
+        "y": 8
+      },
+      "id": 52,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {
+          "titleSize": 15,
+          "valueSize": 26
+        }
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [],
+          "measurement": "cpu",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT non_negative_derivative(last(\"metrics_gathered\"), 1s) FROM \"internal_gather\" WHERE (\"host\" =~ /^$host$/ AND \"input\" =~ /^$input$/) AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "usage_active"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "cpu",
+              "operator": "=",
+              "value": "cpu-total"
+            },
+            {
+              "condition": "AND",
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            }
+          ]
+        }
+      ],
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "displayName": "Memory",
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0d6300",
+                "value": null
+              },
+              {
+                "color": "#ffad00",
+                "value": 75
+              },
+              {
+                "color": "#9e0c0c",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 18,
+        "y": 8
+      },
+      "id": 53,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {
+          "titleSize": 15,
+          "valueSize": 26
+        }
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [],
+          "hide": false,
+          "measurement": "mem",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT non_negative_derivative(last(\"metrics_gathered\"), 1s) FROM \"internal_gather\" WHERE (\"host\" =~ /^$host$/ AND \"input\" =~ /^$input$/) AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": false,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "used_percent"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "condition": "AND",
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            }
+          ]
+        }
+      ],
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "displayName": "Diskusage",
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0d6300",
+                "value": null
+              },
+              {
+                "color": "#ffad00",
+                "value": 75
+              },
+              {
+                "color": "#9e0c0c",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 8
+      },
+      "id": 54,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {
+          "titleSize": 15,
+          "valueSize": 26
+        }
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "alias": "Diskspace",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [],
+          "hide": false,
+          "measurement": "disk",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT non_negative_derivative(last(\"metrics_gathered\"), 1s) FROM \"internal_gather\" WHERE (\"host\" =~ /^$host$/ AND \"input\" =~ /^$input$/) AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": false,
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "used_percent"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "condition": "AND",
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "path",
+              "operator": "=",
+              "value": "/root.dev"
+            }
+          ]
+        }
+      ],
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Interface"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "pattern": "/^switch0\\./",
+                      "result": {
+                        "index": 0,
+                        "text": "VLAN "
+                      }
+                    },
+                    "type": "regex"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RX"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "unit",
+                "value": "bps"
+              },
+              {
+                "id": "noValue",
+                "value": "0 b/s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TX"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bps"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "noValue",
+                "value": "0 b/s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Speed"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "unit",
+                "value": "Mbits"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "index": 0,
+                        "text": "-"
+                      },
+                      "10": {
+                        "index": 1,
+                        "text": "-"
+                      },
+                      "100": {
+                        "color": "#1f71ab",
+                        "index": 2
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "from": 1000,
+                      "result": {
+                        "color": "#0d6300",
+                        "index": 3
+                      },
+                      "to": 10000
+                    },
+                    "type": "range"
+                  }
+                ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0ethernet0": {
+                        "index": 0,
+                        "text": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmlld0JveD0iMCAwIDQ0OCA1MTIiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzE4ODUiCiAgIHNvZGlwb2RpOmRvY25hbWU9InVwLnN2ZyIKICAgd2lkdGg9IjQ0OCIKICAgaGVpZ2h0PSI1MTIiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuMS4xICgzYmY1YWUwZDI1LCAyMDIxLTA5LTIwLCBjdXN0b20pIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxODg5IiAvPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MTg4NyIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMS4wIgogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAuMCIKICAgICBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSJ0cnVlIgogICAgIHNob3dncmlkPSJmYWxzZSIKICAgICBpbmtzY2FwZTpzaG93cGFnZXNoYWRvdz0iZmFsc2UiCiAgICAgaW5rc2NhcGU6em9vbT0iMS4yODcxMDk0IgogICAgIGlua3NjYXBlOmN4PSIyNDIuNzkyMTEiCiAgICAgaW5rc2NhcGU6Y3k9IjI1NS42MTE1MyIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjE5MjAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTAzOCIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iNDIiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJzdmcxODg1IiAvPgogIDwhLS0gRm9udCBBd2Vzb21lIEZyZWUgNS4xNS40IGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgKEljb25zOiBDQyBCWSA0LjAsIEZvbnRzOiBTSUwgT0ZMIDEuMSwgQ29kZTogTUlUIExpY2Vuc2UpIC0tPgogIDxwYXRoCiAgICAgZD0iTSAwLDI1NiBDIDAsMTMyLjI1ODA2IDEwMC4yNTgwNiwzMiAyMjQsMzIgMzQ3Ljc0MTk0LDMyIDQ0OCwxMzIuMjU4MDYgNDQ4LDI1NiA0NDgsMzc5Ljc0MTk0IDM0Ny43NDE5NCw0ODAgMjI0LDQ4MCAxMDAuMjU4MDYsNDgwIDAsMzc5Ljc0MTk0IDAsMjU2IFogTSAyNjMuNzQxOTQsMzYwLjc3NDE5IFYgMjU2IGggNjQuMDM4NzEgYyA5LjY2NDUxLDAgMTQuNTQxOTMsLTExLjc0MTk0IDcuNjc3NDEsLTE4LjUxNjEzIEwgMjMxLjY3NzQyLDEzNC4yNDUxNiBDIDIyNy40MzIyNiwxMzAgMjIwLjY1ODA2LDEzMCAyMTYuNDEyOSwxMzQuMjQ1MTYgTCAxMTIuNTQxOTQsMjM3LjQ4Mzg3IEMgMTA1LjY3NzQyLDI0NC4zNDgzOSAxMTAuNTU0ODQsMjU2IDEyMC4yMTkzNSwyNTYgaCA2NC4wMzg3MSB2IDEwNC43NzQxOSBjIDAsNS45NjEyOSA0Ljg3NzQyLDEwLjgzODcxIDEwLjgzODcxLDEwLjgzODcxIGggNTcuODA2NDYgYyA1Ljk2MTI5LDAgMTAuODM4NzEsLTQuODc3NDIgMTAuODM4NzEsLTEwLjgzODcxIHoiCiAgICAgaWQ9InBhdGgxODgzIgogICAgIHN0eWxlPSJzdHJva2Utd2lkdGg6MC45MDMyMjY7ZmlsbDojMGQ2MzAwO2ZpbGwtb3BhY2l0eToxIiAvPgo8L3N2Zz4K"
+                      },
+                      "0ethernet1": {
+                        "index": 1,
+                        "text": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmlld0JveD0iMCAwIDQ0OCA1MTEuOTk5OTgiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzIyMzgiCiAgIHNvZGlwb2RpOmRvY25hbWU9ImRvd24uc3ZnIgogICB3aWR0aD0iNDQ4IgogICBoZWlnaHQ9IjUxMiIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS4xLjEgKDNiZjVhZTBkMjUsIDIwMjEtMDktMjAsIGN1c3RvbSkiCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnMKICAgICBpZD0iZGVmczIyNDIiIC8+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXcyMjQwIgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzY2NjY2NiIKICAgICBib3JkZXJvcGFjaXR5PSIxLjAiCiAgICAgaW5rc2NhcGU6cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9InRydWUiCiAgICAgc2hvd2dyaWQ9ImZhbHNlIgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSJmYWxzZSIKICAgICB1bml0cz0icHgiCiAgICAgd2lkdGg9IjQ0OG1tIgogICAgIGlua3NjYXBlOnpvb209IjEuMjg3MTA5NCIKICAgICBpbmtzY2FwZTpjeD0iMjQyLjc5MjExIgogICAgIGlua3NjYXBlOmN5PSIyNTUuNjExNTMiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxOTIwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9IjEwMzgiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9IjAiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjQyIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMjIzOCIgLz4KICA8IS0tIEZvbnQgQXdlc29tZSBGcmVlIDUuMTUuNCBieSBAZm9udGF3ZXNvbWUgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbSBMaWNlbnNlIC0gaHR0cHM6Ly9mb250YXdlc29tZS5jb20vbGljZW5zZS9mcmVlIChJY29uczogQ0MgQlkgNC4wLCBGb250czogU0lMIE9GTCAxLjEsIENvZGU6IE1JVCBMaWNlbnNlKSAtLT4KICA8cGF0aAogICAgIGQ9Ik0gNDQ4LDI1NiBDIDQ0OCwzNzkuNzQxOTQgMzQ3Ljc0MTk0LDQ4MCAyMjQsNDgwIDEwMC4yNTgwNiw0ODAgMCwzNzkuNzQxOTQgMCwyNTYgMCwxMzIuMjU4MDYgMTAwLjI1ODA2LDMyIDIyNCwzMiAzNDcuNzQxOTQsMzIgNDQ4LDEzMi4yNTgwNiA0NDgsMjU2IFogTSAxODQuMjU4MDYsMTUxLjIyNTgxIFYgMjU2IGggLTY0LjAzODcxIGMgLTkuNjY0NTEsMCAtMTQuNTQxOTMsMTEuNzQxOTQgLTcuNjc3NDEsMTguNTE2MTMgbCAxMDMuNzgwNjQsMTAzLjIzODcxIGMgNC4yNDUxNiw0LjI0NTE2IDExLjAxOTM2LDQuMjQ1MTYgMTUuMjY0NTIsMCBMIDMzNS4zNjc3NCwyNzQuNTE2MTMgQyAzNDIuMjMyMjYsMjY3LjY1MTYxIDMzNy4zNTQ4NCwyNTYgMzI3LjY5MDMyLDI1NiBIIDI2My43NDE5NCBWIDE1MS4yMjU4MSBjIDAsLTUuOTYxMjkgLTQuODc3NDIsLTEwLjgzODcxIC0xMC44Mzg3MSwtMTAuODM4NzEgaCAtNTcuODA2NDYgYyAtNS45NjEyOSwwIC0xMC44Mzg3MSw0Ljg3NzQyIC0xMC44Mzg3MSwxMC44Mzg3MSB6IgogICAgIGlkPSJwYXRoMjIzNiIKICAgICBzdHlsZT0iZmlsbDojOWUwYzBjO2ZpbGwtb3BhY2l0eToxO3N0cm9rZS13aWR0aDowLjkwMzIyNiIgLz4KPC9zdmc+Cg=="
+                      },
+                      "0ethernet2": {
+                        "index": 2,
+                        "text": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmlld0JveD0iMCAwIDQ0OCA1MTIiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzQwNjgiCiAgIHNvZGlwb2RpOmRvY25hbWU9Im9mZi5zdmciCiAgIHdpZHRoPSI0NDgiCiAgIGhlaWdodD0iNTEyIgogICBpbmtzY2FwZTp2ZXJzaW9uPSIxLjEuMSAoM2JmNWFlMGQyNSwgMjAyMS0wOS0yMCwgY3VzdG9tKSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcwogICAgIGlkPSJkZWZzNDA3MiIgLz4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgaWQ9Im5hbWVkdmlldzQwNzAiCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjNjY2NjY2IgogICAgIGJvcmRlcm9wYWNpdHk9IjEuMCIKICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0idHJ1ZSIKICAgICBzaG93Z3JpZD0iZmFsc2UiCiAgICAgaW5rc2NhcGU6c2hvd3BhZ2VzaGFkb3c9ImZhbHNlIgogICAgIGlua3NjYXBlOnpvb209IjAuOTEwMTIzNzciCiAgICAgaW5rc2NhcGU6Y3g9IjM3NC4xMjQ5NCIKICAgICBpbmtzY2FwZTpjeT0iMTg3Ljg4NjUzIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTkyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMDM4IgogICAgIGlua3NjYXBlOndpbmRvdy14PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy15PSI0MiIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9InN2ZzQwNjgiIC8+CiAgPCEtLSBGb250IEF3ZXNvbWUgRnJlZSA1LjE1LjQgYnkgQGZvbnRhd2Vzb21lIC0gaHR0cHM6Ly9mb250YXdlc29tZS5jb20gTGljZW5zZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tL2xpY2Vuc2UvZnJlZSAoSWNvbnM6IENDIEJZIDQuMCwgRm9udHM6IFNJTCBPRkwgMS4xLCBDb2RlOiBNSVQgTGljZW5zZSkgLS0+CiAgPHBhdGgKICAgICBkPSJtIDI1Mi45MDM0Miw1NC4wMjk5NTYgdiAxNS4yNjI1NzMgYyAwLDkuODk4MzYzIDYuNTc2MzgsMTguNDY5MTg4IDE1Ljk3NDQ0LDIxLjEzMjUxMSA3MC4wMTYxOSwxOS44Mzc5NSAxMjEuMzE1NzUsODQuOTYzMzkgMTIxLjMxNTc1LDE2Mi4zNjM3NSAwLDkzLjE2NSAtNzQuMzMwODksMTY4LjU3NjM1IC0xNjYuMTkzMzgsMTY4LjU3NjM1IC05MS44NDgwNCwwIC0xNjYuMTkzMzkzLC03NS4zOTY2OSAtMTY2LjE5MzM5MywtMTY4LjU3NjM1IDAsLTc3LjM4OTM2IDUxLjI5MDUzMywtMTQyLjUyMzk3IDEyMS4zMTM5NTMsLTE2Mi4zNjM3NSA5LjM5OTg2LC0yLjY2MzMyMyAxNS45NzYyNCwtMTEuMjM1OTgxIDE1Ljk3NjI0LC0yMS4xMzUyNTkgViA1NC4wMzcyODUgYyAwLC0xNC4zOTIyMDUgLTEzLjM5ODQ0LC0yNC44NzY5MjEgLTI3LjEzODMsLTIxLjI4NjQyOCBDIDcwLjk5NjYyOSw1OC4wODQ5NSAtMC41NDY5MTE4NywxNDcuNjE3MzEgMC4wMDMxNTExMywyNTQuMDA5MTQgMC42NTM0NzMxMywzNzkuNTcyODYgMTAwLjY5MTk2LDQ4MC4yNjQyMyAyMjQuNDgyNTUsNDc5Ljk5OTQ4IDM0Ny45NzIzNiw0NzkuNzM1NjEgNDQ4LDM3OC4xMTA2NSA0NDgsMjUyLjc4ODc5IDQ0OCwxNDYuODQ4NjQgMzc2LjUxODc5LDU3Ljg0NTgyOSAyNzkuODA5NTksMzIuNjkwMzg5IGMgLTEzLjY0ODYzLC0zLjU1MDE4IC0yNi45MDYxNyw3LjA0NzIyNSAtMjYuOTA2MTcsMjEuMzM5NTY3IHoiCiAgICAgaWQ9InBhdGg0MDY2IgogICAgIHN0eWxlPSJzdHJva2Utd2lkdGg6MC45MDk2NzY7ZmlsbDojNTk1OTU5O2ZpbGwtb3BhY2l0eToxIiAvPgo8L3N2Zz4K"
+                      },
+                      "0vif0": {
+                        "index": 3,
+                        "text": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmlld0JveD0iMCAwIDQ0OCA1MTIiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEwMzkiCiAgIHNvZGlwb2RpOmRvY25hbWU9IndrLnN2ZyIKICAgd2lkdGg9IjQ0OCIKICAgaGVpZ2h0PSI1MTIiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuMS4xICgzYmY1YWUwZDI1LCAyMDIxLTA5LTIwLCBjdXN0b20pIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxMDQzIiAvPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MTA0MSIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMS4wIgogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAuMCIKICAgICBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSJ0cnVlIgogICAgIHNob3dncmlkPSJmYWxzZSIKICAgICBzaG93Ym9yZGVyPSJ0cnVlIgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSJmYWxzZSIKICAgICBpbmtzY2FwZTp6b29tPSIwLjgwNjY0MDYzIgogICAgIGlua3NjYXBlOmN4PSIzODkuODg4NjIiCiAgICAgaW5rc2NhcGU6Y3k9IjMwMC4wMDk2OSIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjE5MjAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTAzOCIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iNDIiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJzdmcxMDM5IiAvPgogIDwhLS0gRm9udCBBd2Vzb21lIEZyZWUgNS4xNS40IGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgKEljb25zOiBDQyBCWSA0LjAsIEZvbnRzOiBTSUwgT0ZMIDEuMSwgQ29kZTogTUlUIExpY2Vuc2UpIC0tPgogIDxwYXRoCiAgICAgZD0ibSA0NDgsMjYxLjYgdiAtMTEuMiBjIDAsLTYuMTg4IC01LjAxMiwtMTEuMiAtMTEuMiwtMTEuMiBoIC0xOTYgdiAtMjggaCA1MC40IGMgMTIuMzY5LDAgMjIuNCwtMTAuMDMxIDIyLjQsLTIyLjQgViA5OS4yIGMgMCwtMTIuMzY5IC0xMC4wMzEsLTIyLjQgLTIyLjQsLTIyLjQgSCAxNTYuOCBjIC0xMi4zNjksMCAtMjIuNCwxMC4wMzEgLTIyLjQsMjIuNCB2IDg5LjYgYyAwLDEyLjM2OSAxMC4wMzEsMjIuNCAyMi40LDIyLjQgaCA1MC40IHYgMjggSCAxMS4yIEMgNS4wMTIsMjM5LjIgMCwyNDQuMjEyIDAsMjUwLjQgdiAxMS4yIGMgMCw2LjE4OCA1LjAxMiwxMS4yIDExLjIsMTEuMiBIIDg0IHYgMjggSCA0NC44IGMgLTEyLjM2OSwwIC0yMi40LDEwLjAzMSAtMjIuNCwyMi40IHYgODkuNiBjIDAsMTIuMzY5IDEwLjAzMSwyMi40IDIyLjQsMjIuNCBoIDExMiBjIDEyLjM2OSwwIDIyLjQsLTEwLjAzMSAyMi40LC0yMi40IHYgLTg5LjYgYyAwLC0xMi4zNjkgLTEwLjAzMSwtMjIuNCAtMjIuNCwtMjIuNCBoIC0zOS4yIHYgLTI4IGggMjEyLjggdiAyOCBoIC0zOS4yIGMgLTEyLjM2OSwwIC0yMi40LDEwLjAzMSAtMjIuNCwyMi40IHYgODkuNiBjIDAsMTIuMzY5IDEwLjAzMSwyMi40IDIyLjQsMjIuNCBoIDExMiBjIDEyLjM2OSwwIDIyLjQsLTEwLjAzMSAyMi40LC0yMi40IHYgLTg5LjYgYyAwLC0xMi4zNjkgLTEwLjAzMSwtMjIuNCAtMjIuNCwtMjIuNCBIIDM2NCB2IC0yOCBoIDcyLjggYyA2LjE4OCwwIDExLjIsLTUuMDEyIDExLjIsLTExLjIgeiBNIDE3OS4yLDE2Ni40IHYgLTQ0LjggaCA4OS42IHYgNDQuOCB6IG0gLTQ0LjgsMjI0IEggNjcuMiB2IC00NC44IGggNjcuMiB6IG0gMjQ2LjQsMCBoIC02Ny4yIHYgLTQ0LjggaCA2Ny4yIHoiCiAgICAgaWQ9InBhdGgxMDM3IgogICAgIHN0eWxlPSJzdHJva2Utd2lkdGg6MC43O2ZpbGw6IzFmMWYxZjtmaWxsLW9wYWNpdHk6MSIgLz4KPC9zdmc+Cg=="
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "image"
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Received"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "decbytes"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "noValue",
+                "value": "0 B"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "decbytes"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "noValue",
+                "value": "0 B"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 15,
+        "x": 0,
+        "y": 10
+      },
+      "id": 24,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 1,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Interface"
+          }
+        ]
+      },
+      "pluginVersion": "8.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "interface"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "net",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT non_negative_difference(last(\"bytes_recv\")) FROM \"net\" WHERE (\"host\" = 'edgerouter') AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null) LIMIT 1",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "bytes_recv"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "* 8"
+                ],
+                "type": "math"
+              },
+              {
+                "params": [
+                  "rx"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "bytes_sent"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "* 8"
+                ],
+                "type": "math"
+              },
+              {
+                "params": [
+                  "tx"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "interface",
+              "operator": "=~",
+              "value": "/^eth[0-9]$|^switch[0-9]\\.[0-9]{1,}$/"
+            }
+          ]
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "interface"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "type"
+              ],
+              "type": "tag"
+            }
+          ],
+          "hide": false,
+          "measurement": "edgeos_interface",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT last(\"alias\") AS \"description\", last(\"speed\") AS \"speed\", last(\"state\") AS \"state\" FROM \"edgeos_interface\" WHERE (\"host\" = 'edgerouter' AND \"interface\" !~ /switch* | loop* | npi* | itf*/) AND $timeFilter GROUP BY \"interface\", \"type\"",
+          "rawQuery": false,
+          "refId": "B",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "alias"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "description"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "speed"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "speed"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "state"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "state"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "interface",
+              "operator": "=~",
+              "value": "/^eth[0-9]$|^switch[0-9]\\.[0-9]{1,}$/"
+            }
+          ]
+        },
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "hide": false,
+          "query": "SELECT sum(\"bytes_recv\") AS data_in FROM\n(SELECT non_negative_difference(\"bytes_recv\") AS \"bytes_recv\" FROM \"net\" WHERE (\"host\" = 'edgerouter' AND \"interface\" =~ /^eth[0-9]$|^switch[0-9]\\.[0-9]{1,}$/) AND $timeFilter GROUP BY \"interface\")\nGROUP BY \"interface\"",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "table"
+        },
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "hide": false,
+          "query": "SELECT sum(\"bytes_sent\") AS data_out FROM\n(SELECT non_negative_difference(\"bytes_sent\") AS \"bytes_sent\" FROM \"net\" WHERE (\"host\" = 'edgerouter' AND \"interface\" =~ /^eth[0-9]$|^switch[0-9]\\.[0-9]{1,}$/) AND $timeFilter GROUP BY \"interface\")\nGROUP BY \"interface\"",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "seriesToColumns",
+          "options": {
+            "byField": "interface"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "status",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "type",
+                "state"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "bytes_sent": false,
+              "state": true,
+              "type": true
+            },
+            "indexByName": {
+              "Time 1": 5,
+              "Time 2": 6,
+              "Time 3": 9,
+              "Time 4": 11,
+              "data_in": 10,
+              "data_out": 12,
+              "description": 13,
+              "interface": 0,
+              "rx": 7,
+              "speed": 4,
+              "state": 2,
+              "status": 1,
+              "tx": 8,
+              "type": 3
+            },
+            "renameByName": {
+              "bytes_recv": "RX",
+              "bytes_sent": "TX",
+              "data_in": "Received",
+              "data_out": "Sent",
+              "description": "Description",
+              "icon": "Status",
+              "in": "In",
+              "interface": "Interface",
+              "out": "Out",
+              "packets_recv": "In",
+              "packets_sent": "Out",
+              "rx": "RX",
+              "speed": "Speed",
+              "state": "",
+              "status": "Status",
+              "tx": "TX",
+              "type": ""
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "PBB990B61CE1B21F8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepBefore",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#01874d",
+                "value": null
+              },
+              {
+                "color": "#348d3e",
+                "value": -100
+              },
+              {
+                "color": "#68942e",
+                "value": -75
+              },
+              {
+                "color": "#cc9e0f",
+                "value": -50
+              },
+              {
+                "color": "#ffa400",
+                "value": -25
+              },
+              {
+                "color": "#044fbf",
+                "value": 0
+              },
+              {
+                "color": "#363f99",
+                "value": 25
+              },
+              {
+                "color": "#822860",
+                "value": 50
+              },
+              {
+                "color": "#cd1026",
+                "value": 75
+              },
+              {
+                "color": "#d60000",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 9,
+        "x": 15,
+        "y": 12
+      },
+      "id": 47,
+      "maxDataPoints": 150,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last"
+          ],
+          "displayMode": "hidden",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$tag_interface",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "interface"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "net",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT non_negative_derivative(last(\"packets_recv\"), 1s) FROM \"net\" WHERE (\"host\" = 'edgerouter' AND \"interface\" =~ /^eth[0-9]{1,}$|^switch[0-9]\\.[0-9]{1,}$/ AND \"packets_recv\" > 0) AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "packets_recv"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "interface",
+              "operator": "=~",
+              "value": "/^eth[0-9]{1,}$|^switch[0-9]\\.[0-9]{1,}$/"
+            }
+          ]
+        },
+        {
+          "alias": "$tag_interface",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB990B61CE1B21F8"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "interface"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "net",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT non_negative_derivative(last(\"packets_sent\"), 1s) * -1 FROM \"net\" WHERE (\"host\" = 'edgerouter' AND \"interface\" =~ /^eth[0-9]{1,}$|^switch[0-9]\\.[0-9]{1,}$/ AND \"packets_sent\" > 0) AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "packets_sent"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "* -1"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "host",
+              "operator": "=",
+              "value": "edgerouter"
+            },
+            {
+              "condition": "AND",
+              "key": "interface",
+              "operator": "=~",
+              "value": "/^eth[0-9]{1,}$|^switch[0-9]\\.[0-9]{1,}$/"
+            }
+          ]
+        }
+      ],
+      "title": "Packets",
+      "transformations": [],
+      "transparent": true,
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 34,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s"
+    ]
+  },
+  "timezone": "utc",
+  "title": "EdgeRouter",
+  "uid": "bnYaTifnk",
+  "version": 1,
+  "weekStart": ""
+}
