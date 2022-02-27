@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/github/license/x70b1/telegraf-edgeos.svg)](https://github.com/x70b1/telegraf-edgeos/blob/master/LICENSE)
 [![Release](https://img.shields.io/github/v/release/x70b1/telegraf-edgeos?label=Release)](https://github.com/x70b1/telegraf-edgeos/releases)
 
-A lightweight Telegraf distribution customized for Ubiquiti's EdgeOS.
+A lightweight [Telegraf](https://github.com/influxdata/telegraf) distribution customized for Ubiquiti's EdgeOS.
 
 
 ## What is so cool here?
