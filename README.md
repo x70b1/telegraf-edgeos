@@ -1,6 +1,5 @@
 [![Dashboard](grafana/grafana_edgerouter_banner.png)](#)
 
-
 # telegraf-edgeos
 
 [![CI/CD](https://github.com/x70b1/telegraf-edgeos/actions/workflows/cicd.yml/badge.svg?branch=master)](https://github.com/x70b1/telegraf-edgeos/actions)
@@ -92,7 +91,7 @@ Your device is not listed with a green check mark? Please open an issue if you h
 
 Install the prebuild package:
 
-```
+```sh
 curl -L -o telegraf.deb https://github.com/x70b1/telegraf-edgeos/releases/download/{RELEASE}/telegraf_{RELEASE}_{ARCH}.deb
 dpkg -i telegraf.deb
 ```
