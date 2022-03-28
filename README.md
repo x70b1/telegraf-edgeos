@@ -1,4 +1,6 @@
-[![Dashboard](grafana/grafana_edgerouter_banner.png)](#)
+<p align="center">
+  <img src="telegraf-edgeos.png">
+</p>
 
 # telegraf-edgeos
 
@@ -103,6 +105,8 @@ The [sample config](https://github.com/x70b1/telegraf-edgeos/blob/master/configs
 
 
 ## Dashboard
+
+[![Dashboard](grafana/grafana_edgerouter_banner.png)](#)
 
 I added a sample Grafana dashboard.
 
