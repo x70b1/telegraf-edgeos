@@ -4,8 +4,8 @@ on:
     tags:
       - '**'
 env:
-  VERSION_UPSTREAM: 1.22.1
-  VERSION_PACKAGE: 1.22.1-1
+  VERSION_UPSTREAM: 1.22.3
+  VERSION_PACKAGE: 1.22.3-1
 jobs:
   ShellCheck:
     runs-on: ubuntu-latest
@@ -29,7 +29,7 @@ jobs:
       - name: Golang
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: 1.18
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -93,7 +93,7 @@ jobs:
       - name: Golang
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: 1.18
       - name: Checkout
         uses: actions/checkout@v2
         with:
