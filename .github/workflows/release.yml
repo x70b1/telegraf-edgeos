@@ -4,8 +4,8 @@ on:
     tags:
       - '**'
 env:
-  VERSION_UPSTREAM: 1.22.3
-  VERSION_PACKAGE: 1.22.3-1
+  VERSION_UPSTREAM: 1.22.4
+  VERSION_PACKAGE: 1.22.4-1
 jobs:
   ShellCheck:
     runs-on: ubuntu-latest
