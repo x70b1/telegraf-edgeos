@@ -6,8 +6,8 @@ on:
     tags-ignore:
       - '**'
 env:
-  VERSION_UPSTREAM: 1.22.4
-  VERSION_PACKAGE: 1.22.4-1
+  VERSION_UPSTREAM: 1.23.0
+  VERSION_PACKAGE: 1.23.0-1
 jobs:
   ShellCheck:
     runs-on: ubuntu-latest
