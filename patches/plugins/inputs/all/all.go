@@ -14,6 +14,7 @@ import (
 	_ "github.com/influxdata/telegraf/plugins/inputs/iptables"
 	_ "github.com/influxdata/telegraf/plugins/inputs/mem"
 	_ "github.com/influxdata/telegraf/plugins/inputs/net"
+	_ "github.com/influxdata/telegraf/plugins/inputs/netstat"
 	_ "github.com/influxdata/telegraf/plugins/inputs/net_response"
 	_ "github.com/influxdata/telegraf/plugins/inputs/ping"
 	_ "github.com/influxdata/telegraf/plugins/inputs/processes"
