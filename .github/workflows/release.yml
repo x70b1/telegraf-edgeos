@@ -84,7 +84,7 @@ jobs:
           dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}
           dpkg-deb --info telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
           path: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
@@ -149,6 +149,11 @@ jobs:
 
           dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}
           dpkg-deb --info telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
+          path: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
   Release:
     needs:
       - ShellCheck
@@ -167,12 +172,12 @@ jobs:
           draft: true
           prerelease: false
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: telegraf_${{ env.VERSION_PACKAGE }}_mips.deb
           path: ./
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: telegraf_${{ env.VERSION_PACKAGE }}_mipsel.deb
           path: ./
