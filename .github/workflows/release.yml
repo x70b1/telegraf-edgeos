@@ -6,6 +6,8 @@ on:
 env:
   VERSION_UPSTREAM: 1.24.0
   VERSION_PACKAGE: 1.24.0-1
+  TELEGRAF_INPUTS: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
+  TELEGRAF_OUTPUTS: outputs.influxdb,outputs.influxdb_v2,outputs.prometheus_client
 jobs:
   ShellCheck:
     runs-on: ubuntu-latest
@@ -40,12 +42,14 @@ jobs:
           path: telegraf
           repository: influxdb/telegraf
           ref: v${{ env.VERSION_UPSTREAM }}
-      - name: Patches
-        run: cp -r -v telegraf-edgeos/patches/* telegraf/
       - name: Build
         run: |
           cd telegraf
-          GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} go build -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" ./cmd/telegraf
+          GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
+          go build \
+          -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" \
+          -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }}" \
+          ./cmd/telegraf
       - name: sha256sum
         run: sha256sum telegraf/telegraf
       - name: Filesize
@@ -104,12 +108,14 @@ jobs:
           path: telegraf
           repository: influxdb/telegraf
           ref: v${{ env.VERSION_UPSTREAM }}
-      - name: Patches
-        run: cp -r -v telegraf-edgeos/patches/* telegraf/
       - name: Build
         run: |
           cd telegraf
-          GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} go build -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" ./cmd/telegraf
+          GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
+          go build \
+          -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" \
+          -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }}" \
+          ./cmd/telegraf
       - name: sha256sum
         run: sha256sum telegraf/telegraf
       - name: Filesize
@@ -143,11 +149,6 @@ jobs:
 
           dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}
           dpkg-deb --info telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
-          path: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
   Release:
     needs:
       - ShellCheck
