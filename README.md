@@ -64,7 +64,7 @@ edgeos_temperature,sensor=PHY\ 2 temperature=57.50
 |                       | Package               | Internal Plugins      | firmware              | interfaces            | power                 | temperature           |
 | --------------------- | --------------------- | :----:                | :----:                | :----:                | :----:                | :----:                |
 | `ER-X`                | mipsel                | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
-| `ER-X-SFP`            | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+| `ER-X-SFP`            | mipsel                | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
 | `ER-4`                | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
 | `ER-6P`               | mips                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   |
 | `ER‑8`                | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
