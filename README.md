@@ -16,8 +16,7 @@ A lightweight [Telegraf](https://github.com/influxdata/telegraf) distribution cu
 
 This Telegraf is crosscompiled for `mips` and `mipsel`.
 To reduce the size only essential and basic networking related internal plugins are part of the packaged binary.
-Check [inputs](https://github.com/x70b1/telegraf-edgeos/blob/master/patches/plugins/inputs/all/all.go) and [outputs](https://github.com/x70b1/telegraf-edgeos/blob/master/patches/plugins/outputs/all/all.go) to figure out which internal plugins are included.
-The result is a ~ 18 mb binary file instead of ~ 130 mb for a full featured Telegraf.
+The result is a ~ 18 MB binary file instead of ~ 210 MB for a full featured Telegraf.
 So it should fit on every EdgeRouter.
 
 
