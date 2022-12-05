@@ -61,22 +61,22 @@ edgeos_temperature,sensor=PHY\ 2 temperature=57.50
 
 ## Supported Hardware
 
-|                       | Package               | Internal Plugins      | firmware              | interfaces            | power                 | temperature           |
-| --------------------- | --------------------- | :----:                | :----:                | :----:                | :----:                | :----:                |
-| `ER-X`                | mipsel                | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
-| `ER-X-SFP`            | mipsel                | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
-| `ER-4`                | mips                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
-| `ER-6P`               | mips                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   |
-| `ER‑8`                | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
-| `ER-8-XG`             | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
-| `ER-10X`              | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
-| `ER-12`               | mips                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
-| `ER-12P`              | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
-| `ERLite-3`            | mips                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
-| `ERPoe‑5`             | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
-| `ERPro-8`             | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
-| `EP-R6`               | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
-| `EP-R8`               | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+|                       | Family                | Package               | Internal Plugins      | firmware              | interfaces            | power                 | temperature           |
+| --------------------- | --------------------- | --------------------- | :----:                | :----:                | :----:                | :----:                | :----:                |
+| `ER-X`                | E50                   | mipsel                | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
+| `ER-X-SFP`            | E50                   | mipsel                | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
+| `ER-4`                | E300                  | mips                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
+| `ER-6P`               | E300                  | mips                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   |
+| `ER‑8`                | E200                  | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+| `ER-8-XG`             | E1000                 | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+| `ER-10X`              | E50                   | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+| `ER-12`               | E300                  | mips                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    |
+| `ER-12P`              | E300                  | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+| `ERLite-3`            | E100                  | mips                  | :heavy_check_mark:    | :heavy_check_mark:    | :heavy_check_mark:    | :x:                   | :x:                   |
+| `ERPoe‑5`             | E100                  | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+| `ERPro-8`             | E200                  | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+| `EP-R6`               | E50                   | mipsel                | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
+| `EP-R8`               | E200                  | mips                  | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       | :grey_question:       |
 
 
 :heavy_check_mark: = Works for me!
