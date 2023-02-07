@@ -31,7 +31,7 @@ jobs:
       ARCH_GOLANG: mips
     steps:
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: 1.20
       - name: Checkout
@@ -92,7 +92,7 @@ jobs:
       ARCH_GOLANG: mipsle
     steps:
       - name: Golang
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: 1.20
       - name: Checkout
