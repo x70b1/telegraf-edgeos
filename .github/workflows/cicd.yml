@@ -6,8 +6,8 @@ on:
     tags-ignore:
       - '**'
 env:
-  VERSION_UPSTREAM: 1.24.4
-  VERSION_PACKAGE: 1.24.4-2
+  VERSION_UPSTREAM: 1.25.1
+  VERSION_PACKAGE: 1.25.1-1
   TELEGRAF_INPUTS: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
   TELEGRAF_OUTPUTS: outputs.influxdb,outputs.influxdb_v2,outputs.prometheus_client
 jobs:
@@ -33,7 +33,7 @@ jobs:
       - name: Golang
         uses: actions/setup-go@v2
         with:
-          go-version: 1.19
+          go-version: 1.20
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -94,7 +94,7 @@ jobs:
       - name: Golang
         uses: actions/setup-go@v2
         with:
-          go-version: 1.19
+          go-version: 1.20
       - name: Checkout
         uses: actions/checkout@v2
         with:
