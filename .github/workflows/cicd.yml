@@ -10,6 +10,7 @@ env:
   VERSION_PACKAGE: 1.25.1-2
   TELEGRAF_INPUTS: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
   TELEGRAF_OUTPUTS: outputs.influxdb,outputs.influxdb_v2,outputs.prometheus_client
+  TELEGRAF_PARSERS: parsers.influx
 jobs:
   ShellCheck:
     runs-on: ubuntu-latest
@@ -50,7 +51,7 @@ jobs:
           GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
           go build \
           -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" \
-          -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }}" \
+          -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }},${{ env.TELEGRAF_PARSERS }}" \
           ./cmd/telegraf
       - name: sha256sum
         run: sha256sum telegraf/telegraf
@@ -111,7 +112,7 @@ jobs:
           GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
           go build \
           -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" \
-          -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }}" \
+          -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }},${{ env.TELEGRAF_PARSERS }}" \
           ./cmd/telegraf
       - name: sha256sum
         run: sha256sum telegraf/telegraf
