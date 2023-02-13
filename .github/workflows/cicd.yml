@@ -50,7 +50,7 @@ jobs:
           cd telegraf
           GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
           go build \
-          -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" \
+          -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ env.VERSION_UPSTREAM }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
           -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }},${{ env.TELEGRAF_PARSERS }}" \
           ./cmd/telegraf
       - name: sha256sum
@@ -111,7 +111,7 @@ jobs:
           cd telegraf
           GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
           go build \
-          -ldflags "-X main.commit=$(git rev-parse --short=8 HEAD) -X main.branch=$(git rev-parse --abbrev-ref HEAD) -X main.goos=linux -X main.version=${{ env.VERSION_UPSTREAM }} -w -s" \
+          -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ env.VERSION_UPSTREAM }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
           -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }},${{ env.TELEGRAF_PARSERS }}" \
           ./cmd/telegraf
       - name: sha256sum
