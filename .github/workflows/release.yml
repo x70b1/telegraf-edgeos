@@ -46,6 +46,7 @@ jobs:
       - name: Build
         run: |
           cd telegraf
+          CGO_ENABLED=0 \
           GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
           go build \
           -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ env.VERSION_UPSTREAM }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
@@ -112,6 +113,7 @@ jobs:
       - name: Build
         run: |
           cd telegraf
+          CGO_ENABLED=0 \
           GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
           go build \
           -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ env.VERSION_UPSTREAM }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
