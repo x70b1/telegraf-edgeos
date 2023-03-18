@@ -3,6 +3,6 @@ Package: telegraf
 Architecture: #ARCH
 Depends: adduser, curl, jq
 Version: #VERSION
-Description: Plugin-driven server agent for reporting metrics into InfluxDB.
+Description: A lightweight Telegraf distribution customized for Ubiquiti's EdgeOS.
 Installed-Size: #SIZE
 Homepage: https://github.com/x70b1/telegraf-edgeos

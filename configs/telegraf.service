@@ -1,5 +1,5 @@
 [Unit]
-Description=The plugin-driven server agent for reporting metrics into InfluxDB
+Description=A lightweight Telegraf distribution customized for Ubiquiti's EdgeOS.
 Documentation=https://github.com/x70b1/telegraf-edgeos
 After=network.target
 
