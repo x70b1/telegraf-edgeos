@@ -1,0 +1,152 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      flavor:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      build:
+        required: true
+        type: string
+      inputs:
+        required: true
+        type: string
+      outputs:
+        required: true
+        type: string
+      parsers:
+        required: false
+        type: string
+      serializers:
+        required: false
+        type: string
+
+jobs:
+  mips:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Golang
+        uses: actions/setup-go@v4
+        with:
+          cache: false
+          go-version: "1.20"
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: telegraf-edgeos
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: telegraf
+          repository: influxdb/telegraf
+          ref: v${{ inputs.version }}
+      - name: Build
+        run: |
+          cd telegraf
+          CGO_ENABLED=0 \
+          GOOS=linux GOARCH=mips \
+          go build \
+          -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ inputs.version }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
+          -tags "custom,${{ inputs.inputs }},${{ inputs.outputs }},${{ inputs.parsers }},${{ inputs.serializers }}" \
+          ./cmd/telegraf
+      - name: sha256sum
+        run: sha256sum telegraf/telegraf
+      - name: Filesize
+        run: du -h telegraf/telegraf
+      - name: Packaging
+        run: |
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/usr/bin
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/etc/default
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/etc/telegraf/telegraf.d
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/lib/systemd/system
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/etc/sudoers.d/
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/usr/lib/telegraf
+          touch telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/etc/default/telegraf
+          cp telegraf-edgeos/configs/telegraf.conf telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/etc/telegraf/telegraf.conf
+          cp telegraf-edgeos/configs/telegraf.service telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/lib//systemd/system/telegraf.service
+          cp telegraf-edgeos/configs/99telegraf telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/etc/sudoers.d/99telegraf
+          cp telegraf/telegraf telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/usr/bin/telegraf
+          cp -r telegraf-edgeos/plugins/* telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/usr/lib/telegraf/
+          cp -r telegraf-edgeos/packaging/* telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN
+          chmod 0755 telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN/preinst
+          chmod 0755 telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN/postinst
+          chmod 0755 telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN/prerm
+          chmod 0755 telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN/postrm
+          sed -i 's/#VERSION/${{ inputs.version }}-${{ inputs.build }}/' telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN/control
+          sed -i 's/#ARCH/mips/' telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN/control
+          sed -i "s/#SIZE/$(echo $(du -sk --exclude=./telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips | awk '{{ print $1 }}'))/" telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips/DEBIAN/control
+          cd telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips && md5sum $(find * -type f -not -path 'DEBIAN/*') > DEBIAN/md5sums && cd ..
+          dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips
+          dpkg-deb --info telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips.deb
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips.deb
+          path: telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips.deb
+  mipsel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Golang
+        uses: actions/setup-go@v4
+        with:
+          cache: false
+          go-version: "1.20"
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: telegraf-edgeos
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: telegraf
+          repository: influxdb/telegraf
+          ref: v${{ inputs.version }}
+      - name: Build
+        run: |
+          cd telegraf
+          CGO_ENABLED=0 \
+          GOOS=linux GOARCH=mipsle \
+          go build \
+          -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ inputs.version }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
+          -tags "custom,${{ inputs.inputs }},${{ inputs.outputs }},${{ inputs.parsers }},${{ inputs.serializers }}" \
+          ./cmd/telegraf
+      - name: sha256sum
+        run: sha256sum telegraf/telegraf
+      - name: Filesize
+        run: du -h telegraf/telegraf
+      - name: Packaging
+        run: |
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/usr/bin
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/etc/default
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/etc/telegraf/telegraf.d
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/lib/systemd/system
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/etc/sudoers.d/
+          mkdir -p telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/usr/lib/telegraf
+          touch telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/etc/default/telegraf
+          cp telegraf-edgeos/configs/telegraf.conf telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/etc/telegraf/telegraf.conf
+          cp telegraf-edgeos/configs/telegraf.service telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/lib//systemd/system/telegraf.service
+          cp telegraf-edgeos/configs/99telegraf telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/etc/sudoers.d/99telegraf
+          cp telegraf/telegraf telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/usr/bin/telegraf
+          cp -r telegraf-edgeos/plugins/* telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/usr/lib/telegraf/
+          cp -r telegraf-edgeos/packaging/* telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN
+          chmod 0755 telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN/preinst
+          chmod 0755 telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN/postinst
+          chmod 0755 telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN/prerm
+          chmod 0755 telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN/postrm
+          sed -i 's/#VERSION/${{ inputs.version }}-${{ inputs.build }}/' telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN/control
+          sed -i 's/#ARCH/mipsel/' telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN/control
+          sed -i "s/#SIZE/$(echo $(du -sk --exclude=./telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel | awk '{{ print $1 }}'))/" telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel/DEBIAN/control
+          cd telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel && md5sum $(find * -type f -not -path 'DEBIAN/*') > DEBIAN/md5sums && cd ..
+          dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel
+          dpkg-deb --info telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel.deb
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel.deb
+          path: telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel.deb

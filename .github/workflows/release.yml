@@ -1,167 +1,83 @@
 name: Release
+
 on:
   push:
     tags:
       - '**'
+
 env:
   VERSION_UPSTREAM: 1.25.2
-  VERSION_PACKAGE: 1.25.2-1
-  TELEGRAF_INPUTS: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
-  TELEGRAF_OUTPUTS: outputs.influxdb,outputs.influxdb_v2,outputs.prometheus_client
-  TELEGRAF_PARSERS: parsers.influx
+  VERSION_BUILD: 1
+
 jobs:
+  Variables:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ env.VERSION_UPSTREAM }}
+      build: ${{ env.VERSION_BUILD }}
+    steps:
+      - run: echo "Expose env vars"
+
   ShellCheck:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install
-        run: |
-            wget -O /opt/shellcheck-stable.linux.x86_64.tar.xz https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz
-            tar xf /opt/shellcheck-stable.linux.x86_64.tar.xz -C /opt
-      - name: Version4
-        run: /opt/shellcheck-stable/shellcheck --version
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Analysis
-        run: find . '(' -name '*.sh' ')' -exec /opt/shellcheck-stable/shellcheck {} +
-  mips:
-    runs-on: ubuntu-latest
-    env:
-      ARCH_GOLANG: mips
-      ARCH_EDGEOS: mips
-    steps:
-      - name: Golang
-        uses: actions/setup-go@v3
-        with:
-          go-version: "1.20"
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          path: telegraf-edgeos
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          path: telegraf
-          repository: influxdb/telegraf
-          ref: v${{ env.VERSION_UPSTREAM }}
-      - name: Build
-        run: |
-          cd telegraf
-          CGO_ENABLED=0 \
-          GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
-          go build \
-          -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ env.VERSION_UPSTREAM }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
-          -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }},${{ env.TELEGRAF_PARSERS }}" \
-          ./cmd/telegraf
-      - name: sha256sum
-        run: sha256sum telegraf/telegraf
-      - name: Filesize
-        run: du -h telegraf/telegraf
-      - name: Packaging
-        run: |
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/bin
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/default
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/telegraf/telegraf.d
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/lib/systemd/system
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/sudoers.d/
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/lib/telegraf
-
-          touch telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/default/telegraf
-          cp telegraf-edgeos/configs/telegraf.conf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/telegraf/telegraf.conf
-          cp telegraf-edgeos/configs/telegraf.service telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/lib//systemd/system/telegraf.service
-          cp telegraf-edgeos/configs/99telegraf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/sudoers.d/99telegraf
-          cp telegraf/telegraf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/bin/telegraf
-          cp -r telegraf-edgeos/plugins/* telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/lib/telegraf/
-
-          cp -r telegraf-edgeos/packaging/* telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN
-          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/preinst
-          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/postinst
-          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/prerm
-          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/postrm
-          sed -i 's/#VERSION/${{ env.VERSION_PACKAGE }}/' telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
-          sed -i 's/#ARCH/${{ env.ARCH_EDGEOS }}/' telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
-          sed -i "s/#SIZE/$(echo $(du -sk --exclude=./telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }} | awk '{{ print $1 }}'))/" telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
-          cd telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }} && md5sum $(find * -type f -not -path 'DEBIAN/*') > DEBIAN/md5sums && cd ..
-
-          dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}
-          dpkg-deb --info telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
-      - name: Upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
-          path: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
-  mipsel:
-    runs-on: ubuntu-latest
-    env:
-      ARCH_EDGEOS: mipsel
-      ARCH_GOLANG: mipsle
-    steps:
-      - name: Golang
-        uses: actions/setup-go@v3
-        with:
-          go-version: "1.20"
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          path: telegraf-edgeos
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          path: telegraf
-          repository: influxdb/telegraf
-          ref: v${{ env.VERSION_UPSTREAM }}
-      - name: Build
-        run: |
-          cd telegraf
-          CGO_ENABLED=0 \
-          GOOS=linux GOARCH=${{ env.ARCH_GOLANG }} \
-          go build \
-          -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ env.VERSION_UPSTREAM }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
-          -tags "custom,${{ env.TELEGRAF_INPUTS }},${{ env.TELEGRAF_OUTPUTS }},${{ env.TELEGRAF_PARSERS }}" \
-          ./cmd/telegraf
-      - name: sha256sum
-        run: sha256sum telegraf/telegraf
-      - name: Filesize
-        run: du -h telegraf/telegraf
-      - name: Packaging
-        run: |
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/bin
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/default
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/telegraf/telegraf.d
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/lib/systemd/system
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/sudoers.d/
-          mkdir -p telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/lib/telegraf
-
-          touch telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/default/telegraf
-          cp telegraf-edgeos/configs/telegraf.conf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/telegraf/telegraf.conf
-          cp telegraf-edgeos/configs/telegraf.service telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/lib//systemd/system/telegraf.service
-          cp telegraf-edgeos/configs/99telegraf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/etc/sudoers.d/99telegraf
-          cp telegraf/telegraf telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/bin/telegraf
-          cp -r telegraf-edgeos/plugins/* telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/usr/lib/telegraf/
-
-          cp -r telegraf-edgeos/packaging/* telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN
-          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/preinst
-          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/postinst
-          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/prerm
-          chmod 0755 telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/postrm
-          sed -i 's/#VERSION/${{ env.VERSION_PACKAGE }}/' telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
-          sed -i 's/#ARCH/${{ env.ARCH_EDGEOS }}/' telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
-          sed -i "s/#SIZE/$(echo $(du -sk --exclude=./telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }} | awk '{{ print $1 }}'))/" telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}/DEBIAN/control
-          cd telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }} && md5sum $(find * -type f -not -path 'DEBIAN/*') > DEBIAN/md5sums && cd ..
-
-          dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}
-          dpkg-deb --info telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
-      - name: Upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
-          path: telegraf_${{ env.VERSION_PACKAGE }}_${{ env.ARCH_EDGEOS }}.deb
+    uses: ./.github/workflows/shellcheck.yml
+  flavor-influxdb:
+    needs:
+      - Variables
+      - ShellCheck
+    uses: ./.github/workflows/build.yml
+    with:
+      flavor: influxdb
+      version: ${{ needs.Variables.outputs.version }}
+      build: ${{ needs.Variables.outputs.build }}
+      inputs: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
+      outputs: outputs.influxdb,outputs.influxdb_v2
+      parsers: parsers.influx
+      serializers:
+  flavor-prometheus:
+    needs:
+      - Variables
+      - ShellCheck
+    uses: ./.github/workflows/build.yml
+    with:
+      flavor: prometheus
+      version: ${{ needs.Variables.outputs.version }}
+      build: ${{ needs.Variables.outputs.build }}
+      inputs: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
+      outputs: outputs.prometheus_client
+      parsers: parsers.influx
+      serializers:
+  flavor-prometheus-loki:
+    needs:
+      - Variables
+      - ShellCheck
+    uses: ./.github/workflows/build.yml
+    with:
+      flavor: prometheus+loki
+      version: ${{ needs.Variables.outputs.version }}
+      build: ${{ needs.Variables.outputs.build }}
+      inputs: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
+      outputs: outputs.prometheus_client,outputs.loki
+      parsers: parsers.influx
+      serializers:
+  flavor-splunk:
+    needs:
+      - Variables
+      - ShellCheck
+    uses: ./.github/workflows/build.yml
+    with:
+      flavor: splunk
+      version: ${{ needs.Variables.outputs.version }}
+      build: ${{ needs.Variables.outputs.build }}
+      inputs: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
+      outputs: outputs.http
+      parsers: parsers.influx
+      serializers: serializers.splunkmetric
   Release:
     needs:
-      - ShellCheck
-      - mips
-      - mipsel
+      - flavor-influxdb
+      - flavor-prometheus
+      - flavor-prometheus-loki
+      - flavor-splunk
     runs-on: ubuntu-latest
     steps:
       - name: Draft
@@ -177,28 +93,112 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v3
         with:
-          name: telegraf_${{ env.VERSION_PACKAGE }}_mips.deb
+          name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mips.deb
           path: ./
       - name: Download
         uses: actions/download-artifact@v3
         with:
-          name: telegraf_${{ env.VERSION_PACKAGE }}_mipsel.deb
+          name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mipsel.deb
           path: ./
-      - name: telegraf_${{ env.VERSION_PACKAGE }}_mips.deb
+      - name: Download
+        uses: actions/download-artifact@v3
+        with:
+          name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mips.deb
+          path: ./
+      - name: Download
+        uses: actions/download-artifact@v3
+        with:
+          name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mipsel.deb
+          path: ./
+      - name: Download
+        uses: actions/download-artifact@v3
+        with:
+          name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mips.deb
+          path: ./
+      - name: Download
+        uses: actions/download-artifact@v3
+        with:
+          name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mipsel.deb
+          path: ./
+      - name: Download
+        uses: actions/download-artifact@v3
+        with:
+          name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mips.deb
+          path: ./
+      - name: Download
+        uses: actions/download-artifact@v3
+        with:
+          name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mipsel.deb
+          path: ./
+      - name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mips.deb
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.draft.outputs.upload_url }}
-          asset_path: telegraf_${{ env.VERSION_PACKAGE }}_mips.deb
-          asset_name: telegraf_${{ env.VERSION_PACKAGE }}_mips.deb
+          asset_path: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mips.deb
+          asset_name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mips.deb
           asset_content_type: application/vnd.debian.binary-package
-      - name: telegraf_${{ env.VERSION_PACKAGE }}_mipsel.deb
+      - name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mipsel.deb
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.draft.outputs.upload_url }}
-          asset_path: telegraf_${{ env.VERSION_PACKAGE }}_mipsel.deb
-          asset_name: telegraf_${{ env.VERSION_PACKAGE }}_mipsel.deb
+          asset_path: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mipsel.deb
+          asset_name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mipsel.deb
+          asset_content_type: application/vnd.debian.binary-package
+      - name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mips.deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.draft.outputs.upload_url }}
+          asset_path: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mips.deb
+          asset_name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mips.deb
+          asset_content_type: application/vnd.debian.binary-package
+      - name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mipsel.deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.draft.outputs.upload_url }}
+          asset_path: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mipsel.deb
+          asset_name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mipsel.deb
+          asset_content_type: application/vnd.debian.binary-package
+      - name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mips.deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.draft.outputs.upload_url }}
+          asset_path: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mips.deb
+          asset_name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mips.deb
+          asset_content_type: application/vnd.debian.binary-package
+      - name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mipsel.deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.draft.outputs.upload_url }}
+          asset_path: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mipsel.deb
+          asset_name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mipsel.deb
+          asset_content_type: application/vnd.debian.binary-package
+      - name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mips.deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.draft.outputs.upload_url }}
+          asset_path: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mips.deb
+          asset_name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mips.deb
+          asset_content_type: application/vnd.debian.binary-package
+      - name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mipsel.deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.draft.outputs.upload_url }}
+          asset_path: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mipsel.deb
+          asset_name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mipsel.deb
           asset_content_type: application/vnd.debian.binary-package
