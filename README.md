@@ -90,10 +90,14 @@ Your device is not listed with a green check mark? Please open an issue if you h
 
 ## Setup
 
-Install the prebuild package:
+To keep the binary size small, we introduced `flavors`.
+This means that only a specific output like `influxdb_v2` or `prometheus_client` is part of the built binary.
+If you need a different output, create an issue.
+
+Install the prebuild package with your needed flavor:
 
 ```sh
-curl -L -o telegraf.deb https://github.com/x70b1/telegraf-edgeos/releases/download/{RELEASE}/telegraf_{RELEASE}_{ARCH}.deb
+curl -L -o telegraf.deb https://github.com/x70b1/telegraf-edgeos/releases/download/{RELEASE}/telegraf_{REALEASE}+{FLAVOR}_{ARCH}.deb
 dpkg -i telegraf.deb
 ```
 
