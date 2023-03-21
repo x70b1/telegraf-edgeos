@@ -34,6 +34,7 @@ jobs:
       inputs: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
       outputs: outputs.influxdb,outputs.influxdb_v2
       parsers: parsers.influx
+      processors:
       serializers:
   flavor-prometheus:
     needs:
@@ -47,6 +48,7 @@ jobs:
       inputs: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
       outputs: outputs.prometheus_client
       parsers: parsers.influx
+      processors:
       serializers:
   flavor-prometheus-loki:
     needs:
@@ -60,6 +62,7 @@ jobs:
       inputs: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
       outputs: outputs.prometheus_client,outputs.loki
       parsers: parsers.influx
+      processors:
       serializers:
   flavor-splunk:
     needs:
@@ -73,4 +76,5 @@ jobs:
       inputs: inputs.bond,inputs.cpu,inputs.disk,inputs.diskio,inputs.dns_query,inputs.ethtool,inputs.exec,inputs.http_response,inputs.internal,inputs.internet_speed,inputs.iptables,inputs.mem,inputs.net,inputs.netstat,inputs.net_response,inputs.ping,inputs.processes,inputs.snmp,inputs.snmp_legacy,inputs.snmp_trap,inputs.system
       outputs: outputs.http
       parsers: parsers.influx
+      processors: processors.rename
       serializers: serializers.splunkmetric

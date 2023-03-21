@@ -21,6 +21,9 @@ on:
       parsers:
         required: false
         type: string
+      processors:
+        required: false
+        type: string
       serializers:
         required: false
         type: string
@@ -51,7 +54,7 @@ jobs:
           GOOS=linux GOARCH=mips \
           go build \
           -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ inputs.version }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
-          -tags "custom,${{ inputs.inputs }},${{ inputs.outputs }},${{ inputs.parsers }},${{ inputs.serializers }}" \
+          -tags "custom,${{ inputs.inputs }},${{ inputs.outputs }},${{ inputs.parsers }},${{ inputs.processors }},${{ inputs.serializers }}" \
           ./cmd/telegraf
       - name: sha256sum
         run: sha256sum telegraf/telegraf
@@ -113,7 +116,7 @@ jobs:
           GOOS=linux GOARCH=mipsle \
           go build \
           -ldflags "-w -s -X github.com/influxdata/telegraf/internal.Version=${{ inputs.version }} -X github.com/influxdata/telegraf/internal.Branch=$(git rev-parse --abbrev-ref HEAD) -X github.com/influxdata/telegraf/internal.Commit=$(git rev-parse --short=8 HEAD)" \
-          -tags "custom,${{ inputs.inputs }},${{ inputs.outputs }},${{ inputs.parsers }},${{ inputs.serializers }}" \
+          -tags "custom,${{ inputs.inputs }},${{ inputs.outputs }},${{ inputs.parsers }},${{ inputs.processors }},${{ inputs.serializers }}" \
           ./cmd/telegraf
       - name: sha256sum
         run: sha256sum telegraf/telegraf
