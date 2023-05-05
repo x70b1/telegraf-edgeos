@@ -85,13 +85,15 @@ edgeos_interfaces() {
 edgeos_power() {
     power_info=$(sudo /usr/sbin/ubnt-hal getPowerStatus)
 
-    if ! echo "$power_info" | grep "is not supported on this platform"; then
+    if ! echo "$power_info" | grep -q "is not supported on this platform"; then
         echo "$power_info" | while read -r line; do
             power_info_measurement=$(echo "$line" | cut -d ':' -f 1 | rev | cut -d ' ' -f 1 | rev)
             power_info_value=$(echo "$line" | cut -d ':' -f 2 | cut -d ' ' -f 2)
 
             echo "edgeos_power $power_info_measurement=$power_info_value"
         done
+    else
+        echo "Power status is not supported on this platform"
     fi
 }
 
