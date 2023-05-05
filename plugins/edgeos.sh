@@ -93,7 +93,7 @@ edgeos_power() {
             echo "edgeos_power $power_info_measurement=$power_info_value"
         done
     else
-        echo "Power status is not supported on this platform"
+        echo "Collecting power metrics is not supported on this hardware!"
     fi
 }
 
@@ -108,7 +108,7 @@ edgeos_temperature() {
             echo "edgeos_temperature,sensor=$temperature_info_sensor temperature=$temperature_info_value"
         done
     else
-        echo "Temperature not supported on this platform"
+        echo "Collecting temperature metrics is not supported on this hardware!"
     fi
 }
 
