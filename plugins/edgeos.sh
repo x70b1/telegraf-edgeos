@@ -85,26 +85,30 @@ edgeos_interfaces() {
 edgeos_power() {
     power_info=$(sudo /usr/sbin/ubnt-hal getPowerStatus)
 
-    if ! echo "$power_info" | grep "is not supported on this platform"; then
+    if ! echo "$power_info" | grep -q "is not supported on this platform"; then
         echo "$power_info" | while read -r line; do
             power_info_measurement=$(echo "$line" | cut -d ':' -f 1 | rev | cut -d ' ' -f 1 | rev)
             power_info_value=$(echo "$line" | cut -d ':' -f 2 | cut -d ' ' -f 2)
 
             echo "edgeos_power $power_info_measurement=$power_info_value"
         done
+    else
+        echo "Collecting power metrics is not supported on this hardware!"
     fi
 }
 
 edgeos_temperature() {
     temperature_info=$(sudo /usr/sbin/ubnt-hal getTemp | tail -n +2 | head -n -1)
 
-    if ! echo "$temperature_info" | grep "is not supported on this platform"; then
+    if ! [ -z "$temperature_info" ]; then
         echo "$temperature_info" | while read -r line; do
             temperature_info_sensor=$(echo "$line" | cut -d ':' -f 1 | sed 's/ /\\ /')
             temperature_info_value=$(echo "$line" | cut -d ':' -f 2 | cut -d ' ' -f 1)
 
             echo "edgeos_temperature,sensor=$temperature_info_sensor temperature=$temperature_info_value"
         done
+    else
+        echo "Collecting temperature metrics is not supported on this hardware!"
     fi
 }
 
