@@ -100,7 +100,7 @@ edgeos_power() {
 edgeos_temperature() {
     temperature_info=$(sudo /usr/sbin/ubnt-hal getTemp | tail -n +2 | head -n -1)
 
-    if ! [ -z "$temperature_info" ]; then
+    if [ -n "$temperature_info" ]; then
         echo "$temperature_info" | while read -r line; do
             temperature_info_sensor=$(echo "$line" | cut -d ':' -f 1 | sed 's/ /\\ /')
             temperature_info_value=$(echo "$line" | cut -d ':' -f 2 | cut -d ' ' -f 1)
