@@ -4,8 +4,8 @@
 
 # telegraf-edgeos
 
-[![CI/CD](https://github.com/x70b1/telegraf-edgeos/actions/workflows/cicd.yml/badge.svg?branch=master)](https://github.com/x70b1/telegraf-edgeos/actions)
-[![GitHub contributors](https://img.shields.io/github/contributors/x70b1/telegraf-edgeos.svg)](https://github.com/x70b1/telegraf-edgeos/graphs/contributors)
+[![Actions](https://github.com/x70b1/telegraf-edgeos/actions/workflows/cicd.yml/badge.svg)](https://github.com/x70b1/telegraf-edgeos/actions)
+[![Contributors](https://img.shields.io/github/contributors/x70b1/telegraf-edgeos.svg)](https://github.com/x70b1/telegraf-edgeos/graphs/contributors)
 [![License](https://img.shields.io/github/license/x70b1/telegraf-edgeos.svg)](https://github.com/x70b1/telegraf-edgeos/blob/master/LICENSE)
 [![Release](https://img.shields.io/github/v/release/x70b1/telegraf-edgeos?label=Release)](https://github.com/x70b1/telegraf-edgeos/releases)
 
