@@ -6,7 +6,7 @@ on:
       - '**'
 
 env:
-  VERSION_UPSTREAM: 1.30.0
+  VERSION_UPSTREAM: 1.31.2
   VERSION_BUILD: 1
 
 jobs:
