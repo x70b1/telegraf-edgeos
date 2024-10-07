@@ -14,6 +14,6 @@ jobs:
       - name: Version
         run: /opt/shellcheck-stable/shellcheck --version
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Analysis
         run: find . '(' -name '*.sh' ')' -exec /opt/shellcheck-stable/shellcheck {} +
