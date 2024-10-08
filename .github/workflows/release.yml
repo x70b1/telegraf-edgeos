@@ -6,8 +6,8 @@ on:
       - '**'
 
 env:
-  VERSION_UPSTREAM: 1.32.0
-  VERSION_BUILD: 2
+  VERSION_UPSTREAM: 1.32.1
+  VERSION_BUILD: 1
 
 jobs:
   Variables:
