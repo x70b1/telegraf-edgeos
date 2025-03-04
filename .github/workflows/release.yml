@@ -95,42 +95,42 @@ jobs:
           draft: true
           prerelease: false
       - name: Download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mips.deb
           path: ./
       - name: Download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+influxdb_mipsel.deb
           path: ./
       - name: Download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mips.deb
           path: ./
       - name: Download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus_mipsel.deb
           path: ./
       - name: Download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mips.deb
           path: ./
       - name: Download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+prometheus+loki_mipsel.deb
           path: ./
       - name: Download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mips.deb
           path: ./
       - name: Download
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: telegraf_${{ env.VERSION_UPSTREAM }}-${{ env.VERSION_BUILD }}+splunk_mipsel.deb
           path: ./

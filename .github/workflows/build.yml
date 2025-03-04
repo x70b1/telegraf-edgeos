@@ -87,7 +87,7 @@ jobs:
           dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips
           dpkg-deb --info telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips.deb
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips.deb
           path: telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mips.deb
@@ -149,7 +149,7 @@ jobs:
           dpkg-deb --build --root-owner-group -Z gzip telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel
           dpkg-deb --info telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel.deb
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel.deb
           path: telegraf_${{ inputs.version }}-${{ inputs.build }}+${{ inputs.flavor }}_mipsel.deb
