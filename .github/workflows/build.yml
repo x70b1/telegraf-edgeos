@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           cache: false
-          go-version: "1.25"
+          go-version: "1.26"
       - name: Checkout
         uses: actions/checkout@v5
         with:
@@ -98,7 +98,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           cache: false
-          go-version: "1.25"
+          go-version: "1.26"
       - name: Checkout
         uses: actions/checkout@v5
         with:
